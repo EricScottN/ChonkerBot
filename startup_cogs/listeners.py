@@ -11,6 +11,7 @@ class Listeners(commands.Cog):
         self.bot = bot
         self.guild = self.bot.get_guild(DiscordGuilds.heckinchonkers_id)
         self.reactions_to_square = 3
+        self.mentioned_time = None
 
         # Get Discord MEGACHONKERS channel
         self.megachonkers_channel_id = DiscordChannels.megachonkers_channel_id
@@ -160,12 +161,24 @@ class Listeners(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message):
+        created_time = message.created_at
         if 'wine' in message.content.lower() and not message.author.bot:
             list_of_wine_strings = fileloader.load_wine()
             wine_message = random.choice(list_of_wine_strings)
             await message.channel.send(wine_message)
             if message.content.lower() not in (line.lower() for line in list_of_wine_strings) and len(message.mentions) == 0:
                 fileloader.add_wine(message.content)
+        if message.author.id == 448469697034321932 and message.mentions:
+            for member in message.mentions:
+                if member.id == 448469697034321932:
+                    if self.mentioned_time is None:
+                        self.mentioned_time = created_time
+                    else:
+                        if created_time.minute - self.mentioned_time.minute < 10:
+                            await message.channel.send("Leave my master alone. You haz lost a !thx")
+                        self.mentioned_time = created_time
+                else:
+                    continue
         return
 
 
