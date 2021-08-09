@@ -1,8 +1,10 @@
+import sys
 from discord.ext import commands, tasks
 from config.fileloader import fileloader
 import asyncio
 import random
 from config.all_global_variables import *
+
 
 def return_random_word():
     rdowords_list = fileloader.load_rdowords()
@@ -22,21 +24,24 @@ class BotGames(commands.Cog):
         random_word = random.sample(word, len(word))
         if random_word[0] == " " or random_word[-1] == " ":
             self.jumble(word)
-        for index in range(len(random_word) - 2):
-            two_letters = [''.join(random_word[index: index + 1])]
+        for index in range(len(random_word) - 1):
+            two_letters = ''.join(random_word[index: index + 2])
             if two_letters in word:
                 self.jumble(word)
             else:
-                # join() method join the elements
-                # of the iterator(e.g. list) with particular character .
-                jumbled = ''.join(random_word)
-                return jumbled
+                continue
+        # join() method join the elements
+        # of the iterator(e.g. list) with particular character .
+        jumbled = ''.join(random_word)
+        return jumbled
+
+
 
     @tasks.loop()
     async def rdwordjumble(self):
         interval = random.choices(population=[5.00, 10.00, 15.00, 20.00], weights=[0.10, 0.20, 0.30, 0.40])[0]
         print(f'Next RDO word jumble will run in {interval} hours')
-        await asyncio.sleep(interval * 3600)
+        await asyncio.sleep(60)
         jumblies_role = self.guild.get_role(775724493179715616)
         message = await self.stb_active_channel.send(
             f"{jumblies_role.mention} React within 30 seconds with the <:campstew:678376192377618448> emoji to play Red Dead Word Jumble")
@@ -51,27 +56,34 @@ class BotGames(commands.Cog):
             await self.stb_active_channel.trigger_typing()
             await asyncio.sleep(5)
             random_word = return_random_word()
-            jumbled_word = self.jumble(random_word)
-            await self.stb_active_channel.send(f'The jumbled RDO word is: `{jumbled_word}`\nYou have 30 seconds to '
-                                               f'guess correctly!')
-            message = await self.get_message(random_word)
-            if message is not None:
-                response = f"{message.author.display_name} guessed correctly! The word was `{random_word}`!"
-                await self.stb_active_channel.send(response)
-                receiver_id = str(message.author.id)
-                thanks_dict = fileloader.load_thanks()
+            try:
+                jumbled_word = self.jumble(random_word)
+            except RecursionError:
+                jumbled_word = None
+            if jumbled_word:
+                await self.stb_active_channel.send(f'The jumbled RDO word is: `{jumbled_word}`\nYou have 30 seconds to '
+                                                   f'guess correctly!')
+                message = await self.get_message(random_word)
+                if message is not None:
+                    response = f"{message.author.display_name} guessed correctly! The word was `{random_word}`!"
+                    await self.stb_active_channel.send(response)
+                    receiver_id = str(message.author.id)
+                    thanks_dict = fileloader.load_thanks()
 
-                if receiver_id not in thanks_dict:
-                    thanks_dict[receiver_id] = {}
-                    thanks_dict[receiver_id] = 1
+                    if receiver_id not in thanks_dict:
+                        thanks_dict[receiver_id] = {}
+                        thanks_dict[receiver_id] = 1
+                    else:
+                        thanks_dict[receiver_id] += 1
+                    fileloader.dump_thanks(thanks_dict)
+                    response = f"I thanked {message.author.mention}!"
+                    await self.stb_active_channel.send(response)
                 else:
-                    thanks_dict[receiver_id] += 1
-                fileloader.dump_thanks(thanks_dict)
-                response = f"I thanked {message.author.mention}!"
-                await self.stb_active_channel.send(response)
+                    await self.stb_active_channel.send(f'Sorry! Nobody won! The word was `{random_word}`\nBetter luck '
+                                                       f'next time!')
             else:
-                await self.stb_active_channel.send(f'Sorry! Nobody won! The word was `{random_word}`\nBetter luck '
-                                                   f'next time!')
+                await self.stb_active_channel.send(f'I literally tried one thousand times to scramble the word '
+                                                   f'and failed. Sorry. I will try to do better next time.')
         else:
             await self.stb_active_channel.send(f'No takers. Okay maybe next time!')
         return
