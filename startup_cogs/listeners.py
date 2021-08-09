@@ -179,6 +179,13 @@ class Listeners(commands.Cog):
                         self.mentioned_time = created_time
                 else:
                     continue
+        if self.bot.user.mentioned_in(message):
+            if message.author.id == self.bot.id:
+                return
+            messages = await message.author.history(limit=10).flatten()
+            for cee in messages:
+                print(cee)
+            #await message.channel.send("SHUT UP")
         return
 
 
