@@ -20,10 +20,17 @@ class BotGames(commands.Cog):
     def jumble(self, word):
         # sample() method shuffling the characters of the word
         random_word = random.sample(word, len(word))
-        # join() method join the elements
-        # of the iterator(e.g. list) with particular character .
-        jumbled = ''.join(random_word)
-        return jumbled
+        if random_word[0] == " " or random_word[-1] == " ":
+            self.jumble(word)
+        for index in range(len(random_word) - 2):
+            two_letters = [''.join(random_word[index: index + 1])]
+            if two_letters in word:
+                self.jumble(word)
+            else:
+                # join() method join the elements
+                # of the iterator(e.g. list) with particular character .
+                jumbled = ''.join(random_word)
+                return jumbled
 
     @tasks.loop()
     async def rdwordjumble(self):
