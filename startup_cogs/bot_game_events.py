@@ -5,6 +5,7 @@ import asyncio
 import random
 from config.all_global_variables import *
 
+sys.setrecursionlimit(10**6)
 
 def return_random_word():
     rdowords_list = fileloader.load_rdowords()
@@ -82,7 +83,7 @@ class BotGames(commands.Cog):
                     await self.stb_active_channel.send(f'Sorry! Nobody won! The word was `{random_word}`\nBetter luck '
                                                        f'next time!')
             else:
-                await self.stb_active_channel.send(f'I literally tried one thousand times to scramble the word '
+                await self.stb_active_channel.send(f'I literally tried one million times to scramble the word '
                                                    f'and failed. Sorry. I will try to do better next time.')
         else:
             await self.stb_active_channel.send(f'No takers. Okay maybe next time!')
