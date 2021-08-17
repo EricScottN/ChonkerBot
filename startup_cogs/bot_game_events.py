@@ -5,8 +5,6 @@ import asyncio
 import random
 from config.all_global_variables import *
 
-sys.setrecursionlimit(10**6)
-
 def return_random_word():
     rdowords_list = fileloader.load_rdowords()
     random_word = random.choice(rdowords_list)
@@ -20,15 +18,18 @@ class BotGames(commands.Cog):
         self.stb_active_channel = self.bot.get_channel(ActiveChannels.stb_active_channel)
         self.hours = 0
 
-    def jumble(self, word):
+    def jumble(self, word, attempts):
+        attempts += 1
         # sample() method shuffling the characters of the word
         random_word = random.sample(word, len(word))
+        if attempts >= 1000:
+            return random_word
         if random_word[0] == " " or random_word[-1] == " ":
-            self.jumble(word)
+            self.jumble(word, attempts)
         for index in range(len(random_word) - 1):
             two_letters = ''.join(random_word[index: index + 2])
             if two_letters in word:
-                self.jumble(word)
+                self.jumble(word, attempts)
             else:
                 continue
         # join() method join the elements
@@ -47,7 +48,7 @@ class BotGames(commands.Cog):
         message = await self.stb_active_channel.send(
             f"{jumblies_role.mention} React within 30 seconds with the <:campstew:678376192377618448> emoji to play Red Dead Word Jumble")
         await message.add_reaction("<:campstew:678376192377618448>")
-        await asyncio.sleep(30)
+        await asyncio.sleep(45)
         message = await self.stb_active_channel.fetch_message(message.id)
         reaction = [i for i in message.reactions if str(i.emoji.name) == "campstew"][0]
         users = await reaction.users().flatten()
@@ -57,12 +58,9 @@ class BotGames(commands.Cog):
             await self.stb_active_channel.trigger_typing()
             await asyncio.sleep(5)
             random_word = return_random_word()
-            try:
-                jumbled_word = self.jumble(random_word)
-            except RecursionError:
-                jumbled_word = None
+            jumbled_word = self.jumble(random_word, 0)
             if jumbled_word:
-                await self.stb_active_channel.send(f'The jumbled RDO word is: `{jumbled_word}`\nYou have 30 seconds to '
+                await self.stb_active_channel.send(f'The jumbled RDO word is: `{jumbled_word}`\nYou have 45 seconds to '
                                                    f'guess correctly!')
                 message = await self.get_message(random_word)
                 if message is not None:
