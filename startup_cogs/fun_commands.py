@@ -1,3 +1,5 @@
+import datetime
+
 import discord
 from discord.ext import commands
 from config.fileloader import fileloader
@@ -12,6 +14,7 @@ class FunCommands(commands.Cog, name='Fun Commands'):
 
     def __init__(self, bot):
         self.bot = bot
+        self.thx_dict = {}
 
     async def delete_pic_or_gif(self, ctx, pic_or_gif, name, num):
         pics_n_gifs_dict = fileloader.load_pics_n_gifs()
@@ -135,7 +138,23 @@ class FunCommands(commands.Cog, name='Fun Commands'):
             await ctx.channel.send(response)
             return
         else:
+            author_id = str(ctx.message.author.id)
             receiver_id = str(ctx.message.mentions[0].id)
+            time_created = ctx.message.created_at
+            if not self.thx_dict or author_id not in self.thx_dict.keys():
+                self.thx_dict[author_id] = {receiver_id: time_created}
+            else:
+                if receiver_id not in self.thx_dict[author_id].keys():
+                    self.thx_dict[author_id][receiver_id] = time_created
+                else:
+                    d = datetime.timedelta(minutes=60)
+                    if time_created - self.thx_dict[author_id][receiver_id] < d:
+                        await ctx.channel.send("Don't spam thx k thx (You can thank that person in an hour)")
+                        self.thx_dict[author_id][receiver_id] = time_created
+                        return
+                    else:
+                        self.thx_dict[author_id][receiver_id] = time_created
+
             receiver_display_name = ctx.message.mentions[0].display_name
 
             if int(receiver_id) == ctx.message.author.id:

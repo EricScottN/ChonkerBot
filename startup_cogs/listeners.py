@@ -1,5 +1,6 @@
 import discord
 import random
+import datetime
 from discord.ext import commands
 from config.all_global_variables import DiscordChannels, DiscordGuilds, RoleMessages
 from config.fileloader import fileloader
@@ -174,8 +175,9 @@ class Listeners(commands.Cog):
                     if self.mentioned_time is None:
                         self.mentioned_time = created_time
                     else:
-                        if created_time.minute - self.mentioned_time.minute < 10:
-                            await message.channel.send("Leave my master alone. You haz lost a !thx")
+                        d = datetime.timedelta(minutes=10)
+                        if created_time - self.mentioned_time < d:
+                            await message.channel.send("Leave my master alone. You haz lost a !thx. JK no you didn't but stop plz")
                         self.mentioned_time = created_time
                 else:
                     continue
