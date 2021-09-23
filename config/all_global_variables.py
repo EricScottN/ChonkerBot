@@ -33,6 +33,8 @@ class DiscordRoles:
     heckinadmin_role_id = 676206304259342377
     chonkerbot_role_id = 668887526915833856
     megachonkers_role_id = 675467855122137098
+    jumblies_role_id = 775724493179715616
+    fast_fingers_role_id = 781700777626042378
 
 class ActivityStrings:
     delivery_str = 'delivery'

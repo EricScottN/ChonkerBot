@@ -34,6 +34,8 @@ class BotGames(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.guild = self.bot.get_guild(DiscordGuilds.heckinchonkers_id)
+        self.jumbles_role = self.guild.get_role(DiscordRoles.jumblies_role_id)
+        self.fast_fingers_role = self.guild.get_role(DiscordRoles.fast_fingers_role_id)
         self.rdwordjumble.start()
         self.stb_active_channel = self.bot.get_channel(ActiveChannels.stb_active_channel)
         self.hours = 0
@@ -47,9 +49,8 @@ class BotGames(commands.Cog):
             interval = random.choices(population=[5.00, 10.00, 15.00, 20.00], weights=[0.10, 0.20, 0.30, 0.40])[0]
             print(f'Next RDO word jumble will run in {interval} hours')
             await asyncio.sleep(interval * 3600)
-        jumblies_role = self.guild.get_role(775724493179715616)
         message = await self.stb_active_channel.send(
-            f"{jumblies_role.mention} React within 45 seconds with the <:campstew:678376192377618448> emoji to play Red Dead Word Jumble")
+            f"{self.jumbles_role.mention} React within 45 seconds with the <:campstew:678376192377618448> emoji to play Red Dead Word Jumble")
         await message.add_reaction("<:campstew:678376192377618448>")
         await asyncio.sleep(45)
         message = await self.stb_active_channel.fetch_message(message.id)
@@ -61,7 +62,6 @@ class BotGames(commands.Cog):
             await self.stb_active_channel.trigger_typing()
             await asyncio.sleep(5)
             random_word = return_random_word()
-            amt_of_words = len(random_word.split())
             attempts = 0
             jumbled_word = None
             jumble_found = False
@@ -74,7 +74,7 @@ class BotGames(commands.Cog):
             if jumbled_word:
                 await self.stb_active_channel.send(f'The jumbled RDO word is: `{jumbled_word}`\nYou have 30 seconds to '
                                                    f'guess correctly!')
-                message = await self.get_message(random_word)
+                message = await self.get_message(users, random_word)
                 if message is not None:
                     response = f"{message.author.display_name} guessed correctly! The word was `{random_word}`!"
                     await self.stb_active_channel.send(response)
@@ -87,7 +87,12 @@ class BotGames(commands.Cog):
                     else:
                         thanks_dict[receiver_id] += 1
                     fileloader.dump_thanks(thanks_dict)
-                    response = f"I thanked {message.author.mention}!"
+                    fast_finger_role_member = self.fast_fingers_role.members
+                    if fast_finger_role_member:
+                        [await member.remove_roles(self.fast_fingers_role) for member in fast_finger_role_member]
+                    await message.author.add_roles(self.fast_fingers_role)
+                    response = f"I thanked {message.author.mention} and they now " \
+                               f"have the {self.fast_fingers_role.mention}!"
                     await self.stb_active_channel.send(response)
                 else:
                     await self.stb_active_channel.send(f'Sorry! Nobody won! The word was `{random_word}`\nBetter luck '
@@ -100,9 +105,11 @@ class BotGames(commands.Cog):
         return
 
     @commands.Cog.listener()
-    async def get_message(self, rdoword):
+    async def get_message(self, users, rdoword):
         def check(m):
-            if m.author is not self.bot and m.channel == self.stb_active_channel:
+            if m.author is not self.bot \
+                    and m.channel == self.stb_active_channel\
+                    and m.author in users:
                 if m.content.upper() == rdoword:
                     return m
 
