@@ -1,3 +1,4 @@
+import sys
 from discord.ext import commands, tasks
 from config.fileloader import fileloader
 import asyncio
@@ -39,9 +40,13 @@ class BotGames(commands.Cog):
 
     @tasks.loop()
     async def rdwordjumble(self):
-        interval = random.choices(population=[5.00, 10.00, 15.00, 20.00], weights=[0.10, 0.20, 0.30, 0.40])[0]
-        print(f'Next RDO word jumble will run in {interval} hours')
-        await asyncio.sleep(interval * 3600)
+        if len(sys.argv) > 1:
+            await asyncio.sleep(int(sys.argv[1]))
+            del sys.argv[1]
+        else:
+            interval = random.choices(population=[5.00, 10.00, 15.00, 20.00], weights=[0.10, 0.20, 0.30, 0.40])[0]
+            print(f'Next RDO word jumble will run in {interval} hours')
+            await asyncio.sleep(interval * 3600)
         jumblies_role = self.guild.get_role(775724493179715616)
         message = await self.stb_active_channel.send(
             f"{jumblies_role.mention} React within 45 seconds with the <:campstew:678376192377618448> emoji to play Red Dead Word Jumble")
@@ -56,6 +61,7 @@ class BotGames(commands.Cog):
             await self.stb_active_channel.trigger_typing()
             await asyncio.sleep(5)
             random_word = return_random_word()
+            amt_of_words = len(random_word.split())
             attempts = 0
             jumbled_word = None
             jumble_found = False
