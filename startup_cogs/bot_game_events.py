@@ -39,13 +39,14 @@ class BotGames(commands.Cog):
         self.rdwordjumble.start()
         self.stb_active_channel = self.bot.get_channel(ActiveChannels.stb_active_channel)
         self.hours = 0
+        self.jumble_countdown = Arguments.jumble_countdown
 
 
     @tasks.loop()
     async def rdwordjumble(self):
-        if len(sys.argv) > 1:
-            await asyncio.sleep(int(sys.argv[1]))
-            del sys.argv[1]
+        if self.jumble_countdown:
+            await asyncio.sleep(self.jumble_countdown)
+            self.jumble_countdown = None
         else:
             interval = random.choices(population=[5.00, 10.00, 15.00, 20.00], weights=[0.10, 0.20, 0.30, 0.40])[0]
             print(f'Next RDO word jumble will run in {interval} hours')

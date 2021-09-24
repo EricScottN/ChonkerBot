@@ -3,6 +3,7 @@ import logging
 import discord
 from dotenv import load_dotenv
 from discord.ext import commands
+from config.setup import parse_arguments
 from config.queue_objects import aqo
 from config.all_global_variables import FilePaths, ActivityStrings
 
@@ -50,4 +51,5 @@ async def on_ready():
     else:
         print('No active naturalist hosts')
 if __name__ == "__main__":
+    parse_arguments()
     bot.run(os.getenv("TOKEN"))

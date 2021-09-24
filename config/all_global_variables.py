@@ -1,3 +1,6 @@
+class Arguments:
+    jumble_countdown = None
+
 class DiscordGuilds:
     heckinchonkers_id = 668621889593278464
 
@@ -19,13 +22,27 @@ class DiscordChannels:
 class RoleMessages:
     list_of_role_messages = [669866460847276043, 762745355392909323, 775724165322768425]
 
-class ActiveChannels:
+class ActiveChannels(object):
     delivery_active_channel = DiscordChannels.delivery_channel_id
     moonshine_active_channel = DiscordChannels.moonshine_channel_id
     bounty_active_channel = DiscordChannels.bounty_channel_id
     nature_active_channel = DiscordChannels.nature_channel_id
     stb_active_channel = DiscordChannels.stb_channel_id
     general_active_channel = DiscordChannels.general_channel_id
+
+    @classmethod
+    def set_all_channels_to_test(cls):
+        cls.delivery_active_channel = DiscordChannels.bot_testing_channel_id
+        cls.moonshine_active_channel = DiscordChannels.bot_testing_channel_id
+        cls.bounty_active_channel = DiscordChannels.bot_testing_channel_id
+        cls.nature_active_channel = DiscordChannels.bot_testing_channel_id
+        cls.stb_active_channel = DiscordChannels.bot_testing_channel_id
+        cls.general_active_channel = DiscordChannels.bot_testing_channel_id
+
+    @classmethod
+    def set_channels_to_test(cls, *channels):
+        # TODO Add kwargs for one or more channel arguments and set cls variables respectively
+        pass
 
 class DiscordRoles:
     delivery_role_id = 669707245621215244
@@ -36,12 +53,14 @@ class DiscordRoles:
     jumblies_role_id = 775724493179715616
     fast_fingers_role_id = 781700777626042378
 
+
 class ActivityStrings:
     delivery_str = 'delivery'
     moonshine_str = 'moonshine'
     bounty_str = 'bounty'
     nature_str = 'naturalist'
     posse_str = 'general'
+
 
 class FilePaths:
     commands_cog_file_path = 'rdo_role_commands_cogs.all_commands'
