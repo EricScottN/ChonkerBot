@@ -40,6 +40,7 @@ class BotGames(commands.Cog):
         self.stb_active_channel = self.bot.get_channel(ActiveChannels.stb_active_channel)
         self.hours = 0
 
+
     @tasks.loop()
     async def rdwordjumble(self):
         if len(sys.argv) > 1:
@@ -50,7 +51,8 @@ class BotGames(commands.Cog):
             print(f'Next RDO word jumble will run in {interval} hours')
             await asyncio.sleep(interval * 3600)
         message = await self.stb_active_channel.send(
-            f"{self.jumbles_role.mention} React within 45 seconds with the <:campstew:678376192377618448> emoji to play Red Dead Word Jumble")
+            f"{self.jumbles_role.mention} React within 45 seconds with the <:campstew:678376192377618448> emoji to "
+            f"play Red Dead Word Jumble")
         await message.add_reaction("<:campstew:678376192377618448>")
         await asyncio.sleep(45)
         message = await self.stb_active_channel.fetch_message(message.id)
@@ -58,51 +60,56 @@ class BotGames(commands.Cog):
         users = await reaction.users().flatten()
 
         if len(users) > 1:
-            await self.stb_active_channel.send("Okay, lets play! Winner gets a free !thx")
-            await self.stb_active_channel.trigger_typing()
-            await asyncio.sleep(5)
-            random_word = return_random_word()
-            attempts = 0
-            jumbled_word = None
-            jumble_found = False
-            while attempts <= 500 and jumble_found is False:
-                jumbled_word = random.sample(random_word, len(random_word))
-                jumble_found = jumble(random_word, jumbled_word)
-                if not jumble_found:
-                    attempts += 1
-            jumbled_word = ''.join(jumbled_word)
-            if jumbled_word:
-                await self.stb_active_channel.send(f'The jumbled RDO word is: `{jumbled_word}`\nYou have 30 seconds to '
-                                                   f'guess correctly!')
-                message = await self.get_message(users, random_word)
-                if message is not None:
-                    response = f"{message.author.display_name} guessed correctly! The word was `{random_word}`!"
-                    await self.stb_active_channel.send(response)
-                    receiver_id = str(message.author.id)
-                    thanks_dict = fileloader.load_thanks()
-
-                    if receiver_id not in thanks_dict:
-                        thanks_dict[receiver_id] = {}
-                        thanks_dict[receiver_id] = 1
-                    else:
-                        thanks_dict[receiver_id] += 1
-                    fileloader.dump_thanks(thanks_dict)
-                    fast_finger_role_member = self.fast_fingers_role.members
-                    if fast_finger_role_member:
-                        [await member.remove_roles(self.fast_fingers_role) for member in fast_finger_role_member]
-                    await message.author.add_roles(self.fast_fingers_role)
-                    response = f"I thanked {message.author.mention} and they now " \
-                               f"have the {self.fast_fingers_role.mention}!"
-                    await self.stb_active_channel.send(response)
-                else:
-                    await self.stb_active_channel.send(f'Sorry! Nobody won! The word was `{random_word}`\nBetter luck '
-                                                       f'next time!')
-            else:
-                await self.stb_active_channel.send(f'I tried a bajillion times to scramble the word '
-                                                   f'and failed. Sorry. I will try to do better next time.')
+            await self.play_jumble(users)
         else:
             await self.stb_active_channel.send(f'No takers. Okay maybe next time!')
         return
+
+    async def play_jumble(self, users):
+        await self.stb_active_channel.send("Okay, lets play! Winner gets a free !thx")
+        await self.stb_active_channel.trigger_typing()
+        await asyncio.sleep(5)
+        random_word = return_random_word()
+        attempts = 0
+        jumbled_word = None
+        jumble_found = False
+        while attempts <= 500 and jumble_found is False:
+            jumbled_word = random.sample(random_word, len(random_word))
+            jumble_found = jumble(random_word, jumbled_word)
+            if not jumble_found:
+                attempts += 1
+        jumbled_word = ''.join(jumbled_word)
+        if jumbled_word:
+            await self.stb_active_channel.send(f'The jumbled RDO word is: `{jumbled_word}`\nYou have 30 seconds to '
+                                               f'guess correctly!')
+            message = await self.get_message(users, random_word)
+            if message is not None:
+                await self.process_winner(message, random_word)
+            else:
+                await self.stb_active_channel.send(f'Sorry! Nobody won! The word was `{random_word}`\nBetter luck '
+                                                   f'next time!')
+        else:
+            await self.stb_active_channel.send(f'I tried a bajillion times to scramble the word '
+                                               f'and failed. Sorry. I will try to do better next time.')
+
+    async def process_winner(self, message, random_word):
+        response = f"{message.author.display_name} guessed correctly! The word was `{random_word}`!"
+        await self.stb_active_channel.send(response)
+        receiver_id = str(message.author.id)
+        thanks_dict = fileloader.load_thanks()
+        if receiver_id not in thanks_dict:
+            thanks_dict[receiver_id] = {}
+            thanks_dict[receiver_id] = 1
+        else:
+            thanks_dict[receiver_id] += 1
+        fileloader.dump_thanks(thanks_dict)
+        fast_finger_role_member = self.fast_fingers_role.members
+        if fast_finger_role_member:
+            [await member.remove_roles(self.fast_fingers_role) for member in fast_finger_role_member]
+        await message.author.add_roles(self.fast_fingers_role)
+        response = f"I thanked {message.author.mention} and they now " \
+                   f"have the {self.fast_fingers_role.mention}!"
+        await self.stb_active_channel.send(response)
 
     @commands.Cog.listener()
     async def get_message(self, users, rdoword):
