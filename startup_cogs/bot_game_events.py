@@ -12,22 +12,30 @@ def return_random_word():
     return random_word
 
 
-def jumble(random_word, jumbled_word):
+def acceptable_word(jumbled_word, random_word):
     if jumbled_word[0] == " " or jumbled_word[-1] == " ":
         return False
     else:
-        two_letters_in_word = False
-        for index in range(len(random_word) - 1):
+        for index in range(len(jumbled_word) - 1):
             two_letters = ''.join(jumbled_word[index: index + 2])
-            if two_letters in random_word:
-                two_letters_in_word = True
-                break
+            if two_letters in random_word and len(two_letters) > 1:
+                return False
             else:
                 continue
-        if two_letters_in_word:
-            return False
-        else:
-            return True
+        return True
+
+
+async def jumble_word(i, jumbled_word, random_word, word, words):
+    attempts = 0
+    while attempts <= 500:
+        attempts += 1
+        jumbled_word = random.sample(word, len(word))
+        if acceptable_word(jumbled_word, random_word):
+            words[i] = ''.join(jumbled_word)
+            break
+    else:
+        words[i] = ''.join(jumbled_word)
+    return words
 
 
 class BotGames(commands.Cog):
@@ -40,7 +48,6 @@ class BotGames(commands.Cog):
         self.stb_active_channel = self.bot.get_channel(ActiveChannels.stb_active_channel)
         self.hours = 0
         self.jumble_countdown = Arguments.jumble_countdown
-
 
     @tasks.loop()
     async def rdwordjumble(self):
@@ -71,16 +78,15 @@ class BotGames(commands.Cog):
         await self.stb_active_channel.trigger_typing()
         await asyncio.sleep(5)
         random_word = return_random_word()
-        attempts = 0
-        jumbled_word = None
-        jumble_found = False
-        while attempts <= 500 and jumble_found is False:
-            jumbled_word = random.sample(random_word, len(random_word))
-            jumble_found = jumble(random_word, jumbled_word)
-            if not jumble_found:
-                attempts += 1
-        jumbled_word = ''.join(jumbled_word)
-        if jumbled_word:
+        if ' ' in random_word and len(random_word) > 9:
+            words = random_word.split(' ')
+        else:
+            words = [random_word]
+        for index, word in enumerate(words):
+            jumbled_word = None
+            await jumble_word(index, jumbled_word, random_word, word, words)
+        if words:
+            jumbled_word = ' '.join(words)
             await self.stb_active_channel.send(f'The jumbled RDO word is: `{jumbled_word}`\nYou have 30 seconds to '
                                                f'guess correctly!')
             message = await self.get_message(users, random_word)
