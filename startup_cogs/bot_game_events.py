@@ -59,10 +59,10 @@ class BotGames(commands.Cog):
             print(f'Next RDO word jumble will run in {interval} hours')
             await asyncio.sleep(interval * 3600)
         message = await self.stb_active_channel.send(
-            f"{self.jumbles_role.mention} React within 45 seconds with the <:campstew:678376192377618448> emoji to "
+            f"{self.jumbles_role.mention} React within 60 seconds with the <:campstew:678376192377618448> emoji to "
             f"play Red Dead Word Jumble")
         await message.add_reaction("<:campstew:678376192377618448>")
-        await asyncio.sleep(45)
+        await asyncio.sleep(60)
         message = await self.stb_active_channel.fetch_message(message.id)
         reaction = [i for i in message.reactions if str(i.emoji.name) == "campstew"][0]
         users = await reaction.users().flatten()
