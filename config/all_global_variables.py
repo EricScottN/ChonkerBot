@@ -1,5 +1,6 @@
 class Arguments:
     jumble_countdown = None
+    jumble_wait = 69
 
 class DiscordGuilds:
     heckinchonkers_id = 668621889593278464
@@ -74,5 +75,6 @@ class FilePaths:
     txt_winelines = "./files/txt/winelines.txt"
     txt_eightball = "./files/txt/eightball.txt"
     json_pics_n_gifs = "./files/json/pics_n_gifs.json"
+    json_jumbles_time = "./files/json/jumblies_time.json"
 
 
