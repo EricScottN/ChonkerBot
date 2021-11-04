@@ -14,7 +14,6 @@ class FileLoader:
         self.current_queues = FilePaths.json_queue_updated
         self.animals = FilePaths.csv_animals
         self.thanks = FilePaths.json_thanks
-        self.jumblies_time = FilePaths.json_jumbles_time
         self.psn = FilePaths.json_psn
         self.rdowords = FilePaths.csv_rdo_words
         self.winelines = FilePaths.txt_winelines
@@ -43,15 +42,6 @@ class FileLoader:
             for row in csv_reader:
                 animals_list.append(row[0])
         return animals_list
-
-    def load_jumblies_time(self):
-        with open(self.jumblies_time) as jumblies_time_file:
-            jumblies_time_dict = json.load(jumblies_time_file)
-            return jumblies_time_dict
-
-    def dump_jumblies_time(self, updated_jumblies_time):
-        with open(self.jumblies_time, 'w') as jumblies_time_file:
-            json.dump(updated_jumblies_time, jumblies_time_file, indent=4, default=str)
 
     def load_thanks(self):
         with open(self.thanks) as thanks_file:
