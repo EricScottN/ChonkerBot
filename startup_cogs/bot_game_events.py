@@ -169,9 +169,9 @@ class BotGames(commands.Cog):
         await message.author.add_roles(self.fast_fingers_role)
         response = f"I thanked {message.author.mention}! They now " \
                    f"have the {self.fast_fingers_role.mention} and have held it for " \
-                   f"{days_held} {'days' if days_held > 1 else 'day'}, " \
-                   f"{hours_remainder} {'hours' if hours_remainder > 1 else 'hour'}, and " \
-                   f"{mins_remainder} {'minutes' if mins_remainder > 1 else 'minute'} and rank number " \
+                   f"{days_held} {'days' if days_held != 1 else 'day'}, " \
+                   f"{hours_remainder} {'hours' if hours_remainder != 1 else 'hour'}, and " \
+                   f"{mins_remainder} {'minutes' if mins_remainder != 1 else 'minute'} and rank number " \
                    f"**{winner_rank}** overall!"
         await self.stb_active_channel.send(response)
 
