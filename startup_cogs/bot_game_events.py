@@ -164,9 +164,9 @@ class BotGames(commands.Cog):
                 result_str += f'`{str(x).rjust(2)}. {str(v).rjust(2)} minutes held - ' \
                               f'{member.display_name}`\n'
         fast_finger_role_member = self.fast_fingers_role.members
-        #if fast_finger_role_member:
-            #[await member.remove_roles(self.fast_fingers_role) for member in fast_finger_role_member]
-        #await message.author.add_roles(self.fast_fingers_role)
+        if fast_finger_role_member:
+            [await member.remove_roles(self.fast_fingers_role) for member in fast_finger_role_member]
+        await message.author.add_roles(self.fast_fingers_role)
         response = f"I thanked {message.author.mention}! They now " \
                    f"have the {self.fast_fingers_role.mention} and have held it for " \
                    f"{days_held} {'days' if days_held > 1 else 'day'}, " \
