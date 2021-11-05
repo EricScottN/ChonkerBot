@@ -56,7 +56,7 @@ def update_jumblies_time(message):
     created_at = message.created_at
     jumblies_time_dict = fileloader.load_jumblies_time()
     if author_id not in jumblies_time_dict:
-        jumblies_time_dict[author_id] = {'acquired': created_at, 'mins_held': 0}
+        jumblies_time_dict[author_id] = {'acquired': created_at, 'times_acquired': 1, 'mins_held': 0}
     else:
         if jumblies_time_dict[author_id]['acquired']:
             acquired_string = jumblies_time_dict[author_id]['acquired']
@@ -64,6 +64,7 @@ def update_jumblies_time(message):
             time_delta = created_at - acquired_datetime
             jumblies_time_dict[author_id]['mins_held'] += int(time_delta.total_seconds() // 60)
             jumblies_time_dict[author_id]['acquired'] = created_at
+            jumblies_time_dict[author_id]['times_acquired'] += 1
         else:
             for value in jumblies_time_dict.values():
                 if value['acquired']:
@@ -74,6 +75,7 @@ def update_jumblies_time(message):
                     value['acquired'] = ''
                     break
             jumblies_time_dict[author_id]['acquired'] = created_at
+            jumblies_time_dict[author_id]['times_acquired'] += 1
     fileloader.dump_jumblies_time(jumblies_time_dict)
     return jumblies_time_dict
 
@@ -148,6 +150,7 @@ class BotGames(commands.Cog):
         update_thx_dict(winner_id)
         jumblies_time_dict = update_jumblies_time(message)
         total_mins_held = jumblies_time_dict[winner_id]['mins_held']
+        times_acquired = jumblies_time_dict[winner_id]['times_acquired']
         days_held = total_mins_held // 60 // 24
         hours_remainder = (total_mins_held - (days_held * 60 * 24)) // 60
         mins_remainder = (total_mins_held - ((hours_remainder * 60) + (days_held * 60 * 24)))
@@ -155,7 +158,12 @@ class BotGames(commands.Cog):
         sorted_jumblies_time = {k: v for k, v in sorted(jumblies_time_dict.items(),
                                                         key=lambda item: (item[1]['mins_held']),
                                                         reverse=True)}
-        winner_rank = list(sorted_jumblies_time).index(winner_id) + 1
+        sorted_jumblies_acq = {k: v for k, v in sorted(jumblies_time_dict.items(),
+                                                        key=lambda item: (item[1]['times_acquired']),
+                                                        reverse=True)}
+
+        winner_time_rank = list(sorted_jumblies_time).index(winner_id) + 1
+        winner_acq_rank = list(sorted_jumblies_acq).index(winner_id) + 1
         x = 1
         for k, v in sorted_jumblies_time.items():
             member_id = (int(k))
@@ -163,17 +171,23 @@ class BotGames(commands.Cog):
             if member is not None:
                 result_str += f'`{str(x).rjust(2)}. {str(v).rjust(2)} minutes held - ' \
                               f'{member.display_name}`\n'
+
+        response = f"I thanked {message.author.mention}! They now " \
+                   f"have the {self.fast_fingers_role.mention}\n **Total Time Held**:\n" \
+                   f"`{days_held} {'days' if days_held != 1 else 'day'} | " \
+                   f"{hours_remainder} {'hours' if hours_remainder != 1 else 'hour'} | " \
+                   f"{mins_remainder} {'minutes' if mins_remainder != 1 else 'minute'} | " \
+                   f"rank {winner_time_rank} in total time held`\n\n`{message.author.display_name} " \
+                   f"has won jumblies {times_acquired} {'times' if times_acquired != 1 else 'time'} " \
+                   f"and ranks {winner_acq_rank} overall!`"
+        await self.stb_active_channel.send(response)
+        await self.update_jumblies_role(message)
+
+    async def update_jumblies_role(self, message):
         fast_finger_role_member = self.fast_fingers_role.members
         if fast_finger_role_member:
             [await member.remove_roles(self.fast_fingers_role) for member in fast_finger_role_member]
         await message.author.add_roles(self.fast_fingers_role)
-        response = f"I thanked {message.author.mention}! They now " \
-                   f"have the {self.fast_fingers_role.mention} and have held it for " \
-                   f"{days_held} {'days' if days_held != 1 else 'day'}, " \
-                   f"{hours_remainder} {'hours' if hours_remainder != 1 else 'hour'}, and " \
-                   f"{mins_remainder} {'minutes' if mins_remainder != 1 else 'minute'} and rank number " \
-                   f"**{winner_rank}** overall!"
-        await self.stb_active_channel.send(response)
 
     @commands.Cog.listener()
     async def get_message(self, users, rdoword):
