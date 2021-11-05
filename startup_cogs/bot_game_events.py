@@ -62,7 +62,7 @@ def update_jumblies_time(message):
             acquired_string = jumblies_time_dict[author_id]['acquired']
             acquired_datetime = datetime.strptime(acquired_string, "%Y-%m-%d %H:%M:%S.%f")
             time_delta = created_at - acquired_datetime
-            jumblies_time_dict[author_id]['mins_held'] += time_delta.total_seconds() / 60
+            jumblies_time_dict[author_id]['mins_held'] += int(time_delta.total_seconds() // 60)
             jumblies_time_dict[author_id]['acquired'] = created_at
         else:
             for value in jumblies_time_dict.values():
@@ -70,7 +70,7 @@ def update_jumblies_time(message):
                     acquired_string = value['acquired']
                     acquired_datetime = datetime.strptime(acquired_string, "%Y-%m-%d %H:%M:%S.%f")
                     time_delta = created_at - acquired_datetime
-                    value['mins_held'] += time_delta.total_seconds() / 60
+                    value['mins_held'] += int(time_delta.total_seconds() // 60)
                     value['acquired'] = ''
                     break
             jumblies_time_dict[author_id]['acquired'] = created_at
@@ -147,6 +147,10 @@ class BotGames(commands.Cog):
         winner_id = str(message.author.id)
         update_thx_dict(winner_id)
         jumblies_time_dict = update_jumblies_time(message)
+        total_mins_held = jumblies_time_dict[winner_id]['mins_held']
+        days_held = total_mins_held // 60 // 24
+        hours_remainder = (total_mins_held - (days_held * 60 * 24)) // 60
+        mins_remainder = (total_mins_held - ((hours_remainder * 60) + (days_held * 60 * 24)))
         result_str = ''
         sorted_jumblies_time = {k: v for k, v in sorted(jumblies_time_dict.items(),
                                                         key=lambda item: (item[1]['mins_held']),
@@ -160,14 +164,15 @@ class BotGames(commands.Cog):
                 result_str += f'`{str(x).rjust(2)}. {str(v).rjust(2)} minutes held - ' \
                               f'{member.display_name}`\n'
         fast_finger_role_member = self.fast_fingers_role.members
-        if fast_finger_role_member:
-            [await member.remove_roles(self.fast_fingers_role) for member in fast_finger_role_member]
-        await message.author.add_roles(self.fast_fingers_role)
+        #if fast_finger_role_member:
+            #[await member.remove_roles(self.fast_fingers_role) for member in fast_finger_role_member]
+        #await message.author.add_roles(self.fast_fingers_role)
         response = f"I thanked {message.author.mention}! They now " \
                    f"have the {self.fast_fingers_role.mention} and have held it for " \
-                   f"{jumblies_time_dict[winner_id]['mins_held'] / 60 / 24} days, " \
-                   f"{jumblies_time_dict[winner_id]['mins_held'] / 60} hours, and " \
-                   f"{jumblies_time_dict[winner_id]['mins_held']} minutes and rank number **{winner_rank} overall**!"
+                   f"{days_held} {'days' if days_held > 1 else 'day'}, " \
+                   f"{hours_remainder} {'hours' if hours_remainder > 1 else 'hour'}, and " \
+                   f"{mins_remainder} {'minutes' if mins_remainder > 1 else 'minute'} and rank number " \
+                   f"**{winner_rank}** overall!"
         await self.stb_active_channel.send(response)
 
     @commands.Cog.listener()
