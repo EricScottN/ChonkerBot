@@ -146,6 +146,7 @@ class BotGames(commands.Cog):
     async def process_winner(self, message, random_word):
         response = f"{message.author.display_name} guessed correctly! The word was `{random_word}`!"
         await self.stb_active_channel.send(response)
+        await self.update_jumblies_role(message)
         winner_id = str(message.author.id)
         update_thx_dict(winner_id)
         jumblies_time_dict = update_jumblies_time(message)
@@ -181,7 +182,7 @@ class BotGames(commands.Cog):
                    f"has won jumblies {times_acquired} {'times' if times_acquired != 1 else 'time'} " \
                    f"and ranks {winner_acq_rank} overall!`"
         await self.stb_active_channel.send(response)
-        await self.update_jumblies_role(message)
+
 
     async def update_jumblies_role(self, message):
         fast_finger_role_member = self.fast_fingers_role.members
