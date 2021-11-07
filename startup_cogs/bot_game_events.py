@@ -98,7 +98,8 @@ class BotGames(commands.Cog):
             await asyncio.sleep(self.jumble_countdown)
             self.jumble_countdown = None
         else:
-            interval = random.choices(population=[5.00, 10.00, 15.00, 20.00], weights=[0.10, 0.20, 0.30, 0.40])[0]
+            interval = random.choices(population=[1.00, 5.00, 10.00, 15.00, 20.00],
+                                         weights=[0.10, 0.10, 0.15, 0.25, 0.40])[0]
             print(f'Next RDO word jumble will run in {interval} hours')
             await asyncio.sleep(interval * 3600)
         message = await self.stb_active_channel.send(
