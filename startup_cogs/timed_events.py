@@ -151,7 +151,7 @@ class TimedEvents(commands.Cog):
     async def update_heftychonks(self):
         today = datetime.today()
         today_month = today.month
-        thx_dict = fileloader.load_thanks()
+        thx_dict = fileloader.load_json(FilePaths.json_thanks)
 
         if thx_dict['month'] == today_month:
             return
@@ -227,9 +227,9 @@ class TimedEvents(commands.Cog):
                                         f"review the rules over in {self.heftychonks_rules_channel.mention} if you "
                                         f"haven't already. If you still have any questions, feel free to ask in here!")
 
-        fileloader.copy_thx_file(str(thx_dict['month'])+str(today.year))
+        fileloader.copy_json_file(str(thx_dict['month']) + str(today.year), FilePaths.json_thanks)
         thx_dict = {'month': today_month}
-        fileloader.dump_thanks(thx_dict)
+        fileloader.dump_json(thx_dict, FilePaths.json_thanks)
 
     @tasks.loop(seconds=60.0)
     async def check_queue_times(self):

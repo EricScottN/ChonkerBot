@@ -74,7 +74,7 @@ class StartRDORoles(commands.Cog, name='Start RDO Roles'):
         self.guild = self.bot.get_guild(DiscordGuilds.heckinchonkers_id)
 
     def generate_queue_embed(self, activity, host_dict):
-        psn_names = fileloader.load_psn()
+        psn_names = fileloader.load_json(FilePaths.json_psn)
         if host_dict['host_id'] in psn_names:
             embed = discord.Embed(
                 colour=discord.Colour.dark_red(),
@@ -153,7 +153,7 @@ class StartRDORoles(commands.Cog, name='Start RDO Roles'):
             fileloader.dump_queues(aqo.get_all_queues())
             response = f"{delivery_role.mention} {ctx.message.author.mention} has started a delivery with " \
                        f' {str(slots)} open slots! Join with `!j d @mention` the host'
-            psn_names = fileloader.load_psn()
+            psn_names = fileloader.load_json(FilePaths.json_psn)
             if host_id in psn_names:
                 response += f"\n\n{host_display_name}'s PSN is **{psn_names[host_id]}**. Add them if you haven't already!"
             if FilePaths.commands_cog_file_path not in list(self.bot.extensions):
@@ -205,7 +205,7 @@ class StartRDORoles(commands.Cog, name='Start RDO Roles'):
             fileloader.dump_queues(aqo.get_all_queues())
             response = f"{moonshine_role.mention} {ctx.message.author.mention} has started a moonshine delivery with " \
                        f' {str(slots)} open slots! Join with `!j m @mention` the host'
-            psn_names = fileloader.load_psn()
+            psn_names = fileloader.load_json(FilePaths.json_psn)
             if host_id in psn_names:
                 response += f"\n\n{host_display_name}'s PSN is **{psn_names[host_id]}**. Add them if you haven't already!"
             if FilePaths.commands_cog_file_path not in list(self.bot.extensions):
@@ -257,7 +257,7 @@ class StartRDORoles(commands.Cog, name='Start RDO Roles'):
             fileloader.dump_queues(aqo.get_all_queues())
             response = f"{bounty_role.mention} {ctx.message.author.mention} has started a bounty hunt with " \
                        f' {str(slots)} open slots! Join with `!j b @mention` the host'
-            psn_names = fileloader.load_psn()
+            psn_names = fileloader.load_json(FilePaths.json_psn)
             if host_id in psn_names:
                 response += f"\n\n{host_display_name}'s PSN is **{psn_names[host_id]}**. Add them if you haven't already!"
             await ctx.channel.send(response)
@@ -314,7 +314,7 @@ class StartRDORoles(commands.Cog, name='Start RDO Roles'):
             fileloader.dump_queues(aqo.get_all_queues())
             response = f"{nature_role.mention} {ctx.message.author.mention} is doing naturalist missions and has " \
                        f' {str(slots)} open slots! Join with `!j n @mention` the host'
-            psn_names = fileloader.load_psn()
+            psn_names = fileloader.load_json(FilePaths.json_psn)
             if host_id in psn_names:
                 response += f"\n\n{host_display_name}'s PSN is **{psn_names[host_id]}**. Add them if you haven't already!"
             await ctx.channel.send(response)
@@ -387,7 +387,7 @@ class StartRDORoles(commands.Cog, name='Start RDO Roles'):
             response = f"{ctx.message.author.mention} has started a general posse with {str(slots)} open slots! Join " \
                        f"with `!j p @mention` the host \n\nPrivate channel {channel.mention} has been cre" \
                        f"ated under {category.name} for the posse's convenience. Feel free to use it!"
-            psn_names = fileloader.load_psn()
+            psn_names = fileloader.load_json(FilePaths.json_psn)
             if host_id in psn_names:
                 response += f"\n\n{host_display_name}'s PSN is **{psn_names[host_id]}**. Add them if you haven't already!"
             if FilePaths.commands_cog_file_path not in list(self.bot.extensions):

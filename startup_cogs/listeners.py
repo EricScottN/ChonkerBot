@@ -2,7 +2,7 @@ import discord
 import random
 import datetime
 from discord.ext import commands
-from config.all_global_variables import DiscordChannels, DiscordGuilds, RoleMessages
+from config.all_global_variables import DiscordChannels, DiscordGuilds, RoleMessages, FilePaths
 from config.fileloader import fileloader
 
 
@@ -164,11 +164,11 @@ class Listeners(commands.Cog):
     async def on_message(self, message):
         created_time = message.created_at
         if 'wine' in message.content.lower() and not message.author.bot:
-            list_of_wine_strings = fileloader.load_wine()
+            list_of_wine_strings = fileloader.load_txt(FilePaths.txt_winelines)
             wine_message = random.choice(list_of_wine_strings)
             await message.channel.send(wine_message)
             if message.content.lower() not in (line.lower() for line in list_of_wine_strings) and len(message.mentions) == 0:
-                fileloader.add_wine(message.content)
+                fileloader.add_text_line(message.content, FilePaths.txt_winelines)
         if message.author.id == 448469697034321932 and message.mentions:
             for member in message.mentions:
                 if member.id == 448469697034321932:

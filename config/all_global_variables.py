@@ -68,13 +68,14 @@ class FilePaths:
     naturalist_commands_cog_file_path = 'rdo_role_commands_cogs.naturalist_commands'
     json_queue_template = "./files/json/queue_template.json"
     json_queue_updated = "./files/json/queue_updated.json"
-    csv_animals = "./files/txt/animals.csv"
     json_thanks = "./files/json/thanks.json"
     json_psn = "./files/json/psn.json"
-    csv_rdo_words = "./files/txt/rdowords.csv"
-    txt_winelines = "./files/txt/winelines.txt"
-    txt_eightball = "./files/txt/eightball.txt"
     json_pics_n_gifs = "./files/json/pics_n_gifs.json"
     json_jumbles_time = "./files/json/jumblies_time.json"
+    txt_rdo_words = "./files/txt/rdowords.txt"
+    txt_winelines = "./files/txt/winelines.txt"
+    txt_eightball = "./files/txt/eightball.txt"
+    txt_animals = "./files/txt/animals.txt"
+
 
 

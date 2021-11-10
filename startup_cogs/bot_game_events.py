@@ -10,7 +10,7 @@ from config.all_global_variables import *
 
 
 def return_random_word():
-    rdowords_list = fileloader.load_rdowords()
+    rdowords_list = fileloader.load_txt(FilePaths.txt_rdo_words)
     random_word = random.choice(rdowords_list)
     return random_word
 
@@ -42,19 +42,19 @@ async def jumble_word(i, jumbled_word, random_word, word, words):
 
 
 def update_thx_dict(receiver_id):
-    thanks_dict = fileloader.load_thanks()
+    thanks_dict = fileloader.load_json(FilePaths.json_thanks)
     if receiver_id not in thanks_dict:
         thanks_dict[receiver_id] = {}
         thanks_dict[receiver_id] = 1
     else:
         thanks_dict[receiver_id] += 1
-    fileloader.dump_thanks(thanks_dict)
+    fileloader.dump_json(thanks_dict, FilePaths.json_thanks)
 
 
 def update_jumblies_time(message):
     author_id = str(message.author.id)
     created_at = message.created_at
-    jumblies_time_dict = fileloader.load_jumblies_time()
+    jumblies_time_dict = fileloader.load_json(FilePaths.json_jumbles_time)
     if author_id not in jumblies_time_dict:
         jumblies_time_dict[author_id] = {'acquired': created_at, 'times_acquired': 1, 'mins_held': 0}
     else:
@@ -100,8 +100,9 @@ class BotGames(commands.Cog):
         else:
             interval = random.choices(population=[1.00, 5.00, 10.00, 15.00, 20.00],
                                          weights=[0.10, 0.10, 0.15, 0.25, 0.40])[0]
-            print(f'Next RDO word jumble will run in {interval} hours')
-            await asyncio.sleep(interval * 3600)
+            interval_min = random.randint(0, 3600)
+            await self.stb_active_channel.send(f'Next RDO word jumble will run in {interval} hours')
+            await asyncio.sleep(interval * 3600 + interval_min)
         message = await self.stb_active_channel.send(
             f"{self.jumbles_role.mention} React within {self.jumble_wait} (nice) "
             f"seconds with the <:campstew:678376192377618448> emoji to "

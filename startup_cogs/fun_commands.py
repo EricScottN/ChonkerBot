@@ -5,7 +5,7 @@ from discord.ext import commands
 from config.fileloader import fileloader
 import random
 from config.queue_objects import aqo
-from config.all_global_variables import DiscordRoles, ActivityStrings
+from config.all_global_variables import DiscordRoles, ActivityStrings, FilePaths
 import asyncio
 
 
@@ -17,7 +17,7 @@ class FunCommands(commands.Cog, name='Fun Commands'):
         self.thx_dict = {}
 
     async def delete_pic_or_gif(self, ctx, pic_or_gif, name, num):
-        pics_n_gifs_dict = fileloader.load_pics_n_gifs()
+        pics_n_gifs_dict = fileloader.load_json(FilePaths.json_pics_n_gifs)
         pic_or_gif_dict = pics_n_gifs_dict[pic_or_gif]
 
         if name not in pic_or_gif_dict:
@@ -29,12 +29,12 @@ class FunCommands(commands.Cog, name='Fun Commands'):
             return
 
         pic_or_gif_dict[name][num] = '[REDACTED]'
-        fileloader.dump_pics_n_gifs(pics_n_gifs_dict)
+        fileloader.dump_json(pics_n_gifs_dict, FilePaths.json_pics_n_gifs)
         await ctx.channel.send(f'`{pic_or_gif} {name} {num}` has been `[REDACTED]`')
 
 
     async def generate_pic_or_gif(self, ctx, pic_or_gif, name, num):
-        pics_n_gifs_dict = fileloader.load_pics_n_gifs()
+        pics_n_gifs_dict = fileloader.load_json(FilePaths.json_pics_n_gifs)
         pic_or_gif_dict = pics_n_gifs_dict[pic_or_gif]
 
         if name not in pic_or_gif_dict:
@@ -69,7 +69,7 @@ class FunCommands(commands.Cog, name='Fun Commands'):
     async def spirit_animal(self, ctx):
         await ctx.channel.trigger_typing()
         await asyncio.sleep(2)
-        animals = fileloader.load_animals()
+        animals = fileloader.load_txt(FilePaths.txt_animals)
         legendary_animals = []
         for animal in animals:
             if animal.startswith('Legendary'):
@@ -121,7 +121,7 @@ class FunCommands(commands.Cog, name='Fun Commands'):
             if host_id not in list_of_host_ids:
                 await ctx.channel.send(unfound)
                 return
-            thx_dict = fileloader.load_thanks()
+            thx_dict = fileloader.load_json(FilePaths.json_thanks)
             list_of_member_dicts = aqo.get_list_of_members(host_id, activity)
             receiver_str = ''
             for member_dict in list_of_member_dicts:
@@ -133,7 +133,7 @@ class FunCommands(commands.Cog, name='Fun Commands'):
                             thx_dict[member_id] = 1
                         else:
                             thx_dict[member_id] += 1
-            fileloader.dump_thanks(thx_dict)
+            fileloader.dump_json(thx_dict, FilePaths.json_thanks)
             response = f"{ctx.message.author.display_name} thanked:\n{receiver_str}"
             await ctx.channel.send(response)
             return
@@ -162,7 +162,7 @@ class FunCommands(commands.Cog, name='Fun Commands'):
                 await ctx.channel.send(response)
                 return
 
-            thanks_dict = fileloader.load_thanks()
+            thanks_dict = fileloader.load_json(FilePaths.json_thanks)
 
             if receiver_id not in thanks_dict:
                 thanks_dict[receiver_id] = {}
@@ -172,7 +172,7 @@ class FunCommands(commands.Cog, name='Fun Commands'):
 
             response = f"{ctx.message.author.display_name} thanked {receiver_display_name}!"
 
-            fileloader.dump_thanks(thanks_dict)
+            fileloader.dump_json(thanks_dict, FilePaths.json_thanks)
             await ctx.channel.send(response)
 
     megachonkers = DiscordRoles.megachonkers_role_id
@@ -198,7 +198,7 @@ class FunCommands(commands.Cog, name='Fun Commands'):
             await ctx.channel.send('Ummmmmm what do you want to ask me?')
             return
         else:
-            responses = fileloader.load_ball()
+            responses = fileloader.load_txt(FilePaths.txt_eightball)
             response = random.choice(responses)
             await ctx.channel.send(response)
             return
@@ -222,7 +222,7 @@ class FunCommands(commands.Cog, name='Fun Commands'):
                       help='See all available Pics and Gifs')
     async def pandg(self, ctx):
 
-        pics_n_gifs_dict = fileloader.load_pics_n_gifs()
+        pics_n_gifs_dict = fileloader.load_json(FilePaths.json_pics_n_gifs)
         gif_dict = pics_n_gifs_dict['gif']
         pic_dict = pics_n_gifs_dict['pic']
 
@@ -263,8 +263,7 @@ class FunCommands(commands.Cog, name='Fun Commands'):
             await ctx.channel.send(message)
             return
 
-
-        pics_n_gifs_dict = fileloader.load_pics_n_gifs()
+        pics_n_gifs_dict = fileloader.load_json(FilePaths.json_pics_n_gifs)
         pic_or_gif_dict = pics_n_gifs_dict[pic_or_gif]
 
         for p_or_g_arg, p_or_g_entries in pic_or_gif_dict.items():
@@ -286,7 +285,7 @@ class FunCommands(commands.Cog, name='Fun Commands'):
                     x += 1
             pic_or_gif_dict[name.lower()][x] = url
 
-        fileloader.dump_pics_n_gifs(pics_n_gifs_dict)
+        fileloader.dump_json(pics_n_gifs_dict, FilePaths.json_pics_n_gifs)
         await ctx.channel.send(f'I added a new {pic_or_gif}! You can summon it with `!{pic_or_gif} {name.lower()} {x}`')
 
     @create.error
