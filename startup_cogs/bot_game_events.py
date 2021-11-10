@@ -101,7 +101,7 @@ class BotGames(commands.Cog):
             interval = random.choices(population=[1.00, 5.00, 10.00, 15.00, 20.00],
                                          weights=[0.10, 0.10, 0.15, 0.25, 0.40])[0]
             interval_min = random.randint(0, 3600)
-            await self.stb_active_channel.send(f'Next RDO word jumble will run in {interval} hours')
+            print(f'Next RDO word jumble will run in {interval} hours')
             await asyncio.sleep(interval * 3600 + interval_min)
         message = await self.stb_active_channel.send(
             f"{self.jumbles_role.mention} React within {self.jumble_wait} (nice) "
