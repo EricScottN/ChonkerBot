@@ -33,28 +33,33 @@ class FileLoader:
         with open(self.jumblies_time, 'w') as jumblies_time_file:
             json.dump(updated_jumblies_time, jumblies_time_file, indent=4, default=str)
 
-    def load_json(self, json_file):
+    @staticmethod
+    def load_json(json_file):
         with open(json_file) as jf:
             result_dict = json.load(jf)
             return result_dict
 
-    def dump_json(self, updated_json, json_file):
+    @staticmethod
+    def dump_json(updated_json, json_file):
         with open(json_file, 'w') as jf:
             json.dump(updated_json, jf, indent=4)
 
-    def copy_json_file(self, date, file_name):
+    @staticmethod
+    def copy_json_file(date, file_name):
         index = file_name.find('.json')
         new_file_path = file_name[:index] + "_" + date + file_name[index:]
         shutil.copyfile(file_name, new_file_path)
 
-    def load_txt(self, file_name):
+    @staticmethod
+    def load_txt(file_name):
         results_lines = open(file_name)
         content = results_lines.read()
         results_list = content.splitlines()
         results_lines.close()
         return results_list
 
-    def add_text_line(self, line, file_name):
+    @staticmethod
+    def add_text_line(line, file_name):
         with open(file_name, "a") as txt_file:
             txt_file.write(f'\n{line}')
 
