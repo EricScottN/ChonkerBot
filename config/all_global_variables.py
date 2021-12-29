@@ -72,7 +72,7 @@ class FilePaths:
     json_psn = "./files/json/psn.json"
     json_pics_n_gifs = "./files/json/pics_n_gifs.json"
     json_jumbles_time = "./files/json/jumblies_time.json"
-    txt_rdo_words = "./files/txt/rdowords.txt"
+    txt_rdo_words = "./files/txt/rdowords.csv"
     txt_winelines = "./files/txt/winelines.txt"
     txt_eightball = "./files/txt/eightball.txt"
     txt_animals = "./files/txt/animals.txt"

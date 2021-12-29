@@ -10,8 +10,11 @@ from config.all_global_variables import *
 
 
 def return_random_word():
-    rdowords_list = fileloader.load_txt(FilePaths.txt_rdo_words)
-    random_word = random.choice(rdowords_list)
+    rdowords_list = fileloader.load_csv(FilePaths.txt_rdo_words, 2)
+    rdowords_list.sort(key=lambda x: x[1])
+    random_word_list = random.choice(rdowords_list[:50])
+    random_word = random_word_list[0]
+    fileloader.update_csv(random_word, FilePaths.txt_rdo_words, 2)
     return random_word
 
 
@@ -141,6 +144,7 @@ class BotGames(commands.Cog):
             else:
                 await self.stb_active_channel.send(f'Sorry! Nobody won! The word was `{random_word}`\nBetter luck '
                                                    f'next time!')
+
         else:
             await self.stb_active_channel.send(f'I tried a bajillion times to scramble the word '
                                                f'and failed. Sorry. I will try to do better next time.')
@@ -189,7 +193,7 @@ class BotGames(commands.Cog):
     async def update_jumblies_role(self, message):
         fast_finger_role_member = self.fast_fingers_role.members
         if fast_finger_role_member:
-            [await member.remove_roles(self.fast_fingers_role) for member in fast_finger_role_member]
+            [member.remove_roles(self.fast_fingers_role) for member in fast_finger_role_member]
         await message.author.add_roles(self.fast_fingers_role)
 
     @commands.Cog.listener()

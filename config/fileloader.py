@@ -59,6 +59,28 @@ class FileLoader:
         return results_list
 
     @staticmethod
+    def load_csv(file_name, max_cols):
+        csv_list = []
+        with open(file_name, "r") as csv_file:
+            csv_reader = csv.reader(csv_file, delimiter=',')
+            for row in csv_reader:
+                csv_list.append([row[i] for i in range(max_cols)])
+        return csv_list
+
+    @staticmethod
+    def update_csv(word, file_name, max_cols):
+        csv_list = fileloader.load_csv(file_name, max_cols)
+        for word_list in csv_list:
+            if word_list[0] == word:
+                times_used = int(word_list[1])
+                times_used += 1
+                word_list[1] = times_used
+                break
+        with open(file_name, 'w', newline='') as csv_file:
+            csv_writer = csv.writer(csv_file)
+            csv_writer.writerows(csv_list)
+
+    @staticmethod
     def add_text_line(line, file_name):
         with open(file_name, "a") as txt_file:
             txt_file.write(f'\n{line}')
