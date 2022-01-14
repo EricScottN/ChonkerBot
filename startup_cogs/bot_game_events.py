@@ -89,7 +89,7 @@ class BotGames(commands.Cog):
         self.guild = self.bot.get_guild(DiscordGuilds.heckinchonkers_id)
         self.jumbles_role = self.guild.get_role(DiscordRoles.jumblies_role_id)
         self.fast_fingers_role = self.guild.get_role(DiscordRoles.fast_fingers_role_id)
-        self.rdwordjumble.start()
+        #self.rdwordjumble.start()
         self.stb_active_channel = self.bot.get_channel(ActiveChannels.stb_active_channel)
         self.hours = 0
         self.jumble_countdown = Arguments.jumble_countdown
