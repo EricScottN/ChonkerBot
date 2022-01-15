@@ -169,6 +169,12 @@ class Listeners(commands.Cog):
             await message.channel.send(wine_message)
             if message.content.lower() not in (line.lower() for line in list_of_wine_strings) and len(message.mentions) == 0:
                 fileloader.add_text_line(message.content, FilePaths.txt_winelines)
+        if any(x in message.content.lower() for x in
+               ['chonkerbot', 'chonker', 'chonky', 'chonk']) and not message.author.bot:
+            await message.channel.send(random.choice(["That's CHOCKERBOT to you, ma'am!",
+                                                      "It's Chockerbot. Get it right next time!",
+                                                      "You may refer to me as ChockerBot, thank you.",
+                                                      f"My name is now ChockerBot. Just ask Garlic!"]))
         if message.author.id == 448469697034321932 and message.mentions:
             for member in message.mentions:
                 if member.id == 448469697034321932:
